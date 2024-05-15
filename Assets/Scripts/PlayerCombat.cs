@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerCombat : MonoBehaviour
 {
@@ -12,11 +13,12 @@ public class PlayerCombat : MonoBehaviour
     int currentHeath;    
     public float attackRange = 0.5f;
     public int attackDamage = 40;
-
-    void Start()
-    {
+    
+     void Start()
+     {
         currentHeath = maxHealth;
-    }
+   
+     }
 
     void Update()
     {
@@ -44,22 +46,28 @@ public class PlayerCombat : MonoBehaviour
         
         Gizmos.DrawWireSphere(attackPoint.position, attackRange);
     }
-    public void TakeDamage(int damage)
+    private void OnCollisionStay2D(Collision2D collision)
     {
-        currentHeath -= damage;
-
-        if(currentHeath <= 0)
-        {
-            Die();
+        if(collision.gameObject.tag == "Enemies" )
+        {          
+           currentHeath = maxHealth - 100;
+           animator.SetTrigger("Hurt");
+           if(currentHeath <= 0)
+           {
+             Die();
+           }
+           return;
         }
+        
     }
-    // Update is called once per frame
+
     void Die()
     {
         animator.SetBool("IsDead", true);// Death animation
+    }
 
-        GetComponent<Collider2D>().enabled = false;
-        Destroy(gameObject,1);     
-        this.enabled = false;
+    private void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
